@@ -1,6 +1,6 @@
 name: Java CI with Gradle
 
-on: [ pull_request, push ]
+on: [pull_request, push]
 
 jobs:
   build:
@@ -19,8 +19,13 @@ jobs:
           check-latest: true
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Upload Build Artifacts
+      - name: Upload Build Artifacts - Fabric
         uses: actions/upload-artifact@v4
         with:
-          name: 'RSO Artifacts'
-          path: build/libs
+          name: 'RSO Fabric Artifacts'
+          path: fabric/build/libs
+      - name: Upload Build Artifacts - NeoForge
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'RSO NeoForge Artifacts'
+          path: neoforge/build/libs
