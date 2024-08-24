@@ -27,7 +27,7 @@ public class TabFrame extends AbstractFrame {
     private final Runnable onSetTab;
     private final AtomicReference<Component> tabSectionSelectedTab;
     private ScrollBarComponent tabSectionScrollBar = null;
-    private Tab<?> selectedTab;
+    private Optional<Tab<?>> selectedTab = Optional.empty();
     private AbstractFrame selectedFrame;
 
     public TabFrame(Dim2i dim, boolean renderOutline, List<Tab<?>> tabs, Runnable onSetTab, AtomicReference<Component> tabSectionSelectedTab, AtomicReference<Integer> tabSectionScrollBarOffset) {
@@ -53,22 +53,27 @@ public class TabFrame extends AbstractFrame {
         this.tabSectionSelectedTab = tabSectionSelectedTab;
 
         if (this.tabSectionSelectedTab.get() != null) {
-            this.selectedTab = this.tabs.stream().filter(tab -> tab.getTitle().getString().equals(this.tabSectionSelectedTab.get().getString())).findAny().get();
+            this.selectedTab = this.tabs.stream().filter(tab -> tab.getTitle().getString().equals(this.tabSectionSelectedTab.get().getString())).findAny();
         }
 
         this.buildFrame();
 
         // Let's build each frame, future note for anyone: do not move this line.
-        this.tabs.stream().filter(tab -> this.selectedTab != tab).forEach(tab -> tab.getFrameFunction().apply(this.frameSection));
+        this.tabs.stream().filter(tab -> {
+            if (this.selectedTab.isEmpty()) {
+                this.selectedTab.get();
+            }
+            return false;
+        }).forEach(tab -> tab.getFrameFunction().apply(this.frameSection));
     }
 
     public static Builder createBuilder() {
         return new Builder();
     }
 
-    public void setTab(Tab<?> tab) {
+    public void setTab(Optional<Tab<?>> tab) {
         this.selectedTab = tab;
-        this.tabSectionSelectedTab.set(this.selectedTab.getTitle());
+        this.selectedTab.ifPresent(value -> this.tabSectionSelectedTab.set(value.getTitle()));
         if (this.onSetTab != null) {
             this.onSetTab.run();
         }
@@ -81,10 +86,10 @@ public class TabFrame extends AbstractFrame {
         this.renderable.clear();
         this.controlElements.clear();
 
-        if (this.selectedTab == null) {
+        if (this.selectedTab.isEmpty() || this.selectedTab.isEmpty()) {
             if (!this.tabs.isEmpty()) {
                 // Just use the first tab for now
-                this.selectedTab = this.tabs.get(0);
+                this.selectedTab = Optional.ofNullable(this.tabs.getFirst());
             }
         }
 
@@ -122,8 +127,8 @@ public class TabFrame extends AbstractFrame {
             Dim2i tabDim = new Dim2i(0, offsetY, width, height);
             ((Dim2iExtended)(Object) tabDim).setPoint2i(((Point2i)(Object) this.tabSection));
 
-            FlatButtonWidget button = new FlatButtonWidget(tabDim, tab.getTitle(), () -> this.setTab(tab));
-            button.setSelected(this.selectedTab == tab);
+            FlatButtonWidget button = new FlatButtonWidget(tabDim, tab.getTitle(), () -> this.setTab(Optional.of(tab)));
+            button.setSelected(this.selectedTab.isPresent() && this.selectedTab.get() == tab);
             ((FlatButtonWidgetExtended) button).setLeftAligned(true);
             this.children.add(button);
 
@@ -132,8 +137,8 @@ public class TabFrame extends AbstractFrame {
     }
 
     private void rebuildTabFrame() {
-        if (this.selectedTab == null) return;
-        AbstractFrame frame = this.selectedTab.getFrameFunction().apply(this.frameSection);
+        if (this.selectedTab.isEmpty()) return;
+        AbstractFrame frame = this.selectedTab.get().getFrameFunction().apply(this.frameSection);
         if (frame != null) {
             this.selectedFrame = frame;
             frame.buildFrame();
@@ -219,5 +224,17 @@ public class TabFrame extends AbstractFrame {
 
             return new TabFrame(this.dim, this.renderOutline, this.functions, this.onSetTab, this.tabSectionSelectedTab, this.tabSectionScrollBarOffset);
         }
+    }
+
+    public List<Tab<?>> getTabs() {
+        return tabs;
+    }
+
+    public AbstractFrame getSelectedFrame() {
+        return selectedFrame;
+    }
+
+    public Optional<Tab<?>> getSelectedTab() {
+        return selectedTab;
     }
 }

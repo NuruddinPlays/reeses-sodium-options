@@ -10,8 +10,10 @@ val FABRIC_LOADER_VERSION: String by rootProject.extra
 val FABRIC_API_VERSION: String by rootProject.extra
 val MOD_VERSION: String by rootProject.extra
 
+val SODIUM_VERSION: String by rootProject.extra
+
 base {
-    archivesName.set("reeses-sodium-options-fabric")
+    archivesName.set("${rootProject.name}-fabric")
 }
 
 dependencies {
@@ -37,13 +39,13 @@ dependencies {
     addEmbeddedFabricModule("fabric-rendering-fluids-v1")
     addEmbeddedFabricModule("fabric-resource-loader-v0")
     compileOnly(project(":common"))
-    modImplementation("maven.modrinth:sodium:mc1.21-0.6.0-beta.1-fabric")
+    modImplementation("maven.modrinth:sodium:$SODIUM_VERSION-fabric")
 
 }
 
 loom {
     @Suppress("UnstableApiUsage")
-    mixin { defaultRefmapName.set("reeses-sodium-options.refmap.json") }
+    mixin { defaultRefmapName.set("${rootProject.name}.refmap.json") }
 
     runs {
         named("client") {

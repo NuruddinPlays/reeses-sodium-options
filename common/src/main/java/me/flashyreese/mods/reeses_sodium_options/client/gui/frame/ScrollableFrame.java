@@ -30,7 +30,7 @@ public class ScrollableFrame extends AbstractFrame {
         this.buildFrame();
     }
 
-    public static Builder createBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -183,27 +183,27 @@ public class ScrollableFrame extends AbstractFrame {
         private AtomicReference<Integer> verticalScrollBarOffset = new AtomicReference<>(0);
         private AtomicReference<Integer> horizontalScrollBarOffset = new AtomicReference<>(0);
 
-        public Builder setDimension(Dim2i dim) {
+        public Builder withDimension(Dim2i dim) {
             this.dim = dim;
             return this;
         }
 
-        public Builder shouldRenderOutline(boolean state) {
+        public Builder withRenderOutline(boolean state) {
             this.renderOutline = state;
             return this;
         }
 
-        public Builder setVerticalScrollBarOffset(AtomicReference<Integer> verticalScrollBarOffset) {
+        public Builder withVerticalScrollBarOffset(AtomicReference<Integer> verticalScrollBarOffset) {
             this.verticalScrollBarOffset = verticalScrollBarOffset;
             return this;
         }
 
-        public Builder setHorizontalScrollBarOffset(AtomicReference<Integer> horizontalScrollBarOffset) {
+        public Builder withHorizontalScrollBarOffset(AtomicReference<Integer> horizontalScrollBarOffset) {
             this.horizontalScrollBarOffset = horizontalScrollBarOffset;
             return this;
         }
 
-        public Builder setFrame(AbstractFrame frame) {
+        public Builder withFrame(AbstractFrame frame) {
             this.frame = frame;
             return this;
         }

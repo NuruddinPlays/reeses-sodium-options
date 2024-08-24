@@ -111,4 +111,8 @@ public abstract class AbstractFrame extends AbstractWidget implements ContainerE
     public ScreenRectangle getRectangle() {
         return new ScreenRectangle(this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height());
     }
+
+    public List<ControlElement<?>> getControlElements() {
+        return controlElements;
+    }
 }

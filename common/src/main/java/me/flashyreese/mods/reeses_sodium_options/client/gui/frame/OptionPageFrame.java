@@ -38,7 +38,7 @@ public class OptionPageFrame extends AbstractFrame {
         this.buildFrame();
     }
 
-    public static Builder createBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -178,17 +178,17 @@ public class OptionPageFrame extends AbstractFrame {
         private boolean renderOutline;
         private OptionPage page;
 
-        public Builder setDimension(Dim2i dim) {
+        public Builder withDimension(Dim2i dim) {
             this.dim = dim;
             return this;
         }
 
-        public Builder shouldRenderOutline(boolean renderOutline) {
+        public Builder withRenderOutline(boolean renderOutline) {
             this.renderOutline = renderOutline;
             return this;
         }
 
-        public Builder setOptionPage(OptionPage page) {
+        public Builder withOptionPage(OptionPage page) {
             this.page = page;
             return this;
         }

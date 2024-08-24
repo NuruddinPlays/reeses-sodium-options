@@ -44,7 +44,7 @@ jobs:
 
           dependencies: |
             sodium
-            reeses-sodium-options(optional)
+            sodium-extra(optional)
             irisshaders(optional)
             iris(optional)
 
@@ -70,7 +70,7 @@ jobs:
 
           dependencies: |
             sodium
-            reeses-sodium-options(optional)
+            sodium-extra(optional)
             irisshaders(optional)
             iris(optional)
 
