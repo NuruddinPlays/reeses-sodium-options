@@ -212,9 +212,9 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
     }
 
     public BasicFrame.Builder parentBasicFrameBuilder(Dim2i parentBasicFrameDim, Dim2i tabFrameDim) {
-        return BasicFrame.createBuilder()
-                .setDimension(parentBasicFrameDim)
-                .shouldRenderOutline(false)
+        return BasicFrame.builder()
+                .withDimension(parentBasicFrameDim)
+                .withRenderOutline(false)
                 .addChild(dim -> this.donateButton)
                 .addChild(dim -> this.hideDonateButton)
                 .addChild(parentDim -> TabFrame.createBuilder()
@@ -225,7 +225,7 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
                         .addTabs(tabs -> this.pages
                                 .stream()
                                 .filter(page -> !page.getGroups().isEmpty())
-                                .forEach(page -> tabs.add(Tab.createBuilder().from(page, optionPageScrollBarOffset)))
+                                .forEach(page -> tabs.add(Tab.builder().from(page, optionPageScrollBarOffset)))
                         )
                         .onSetTab(() -> {
                             optionPageScrollBarOffset.set(0);

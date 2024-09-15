@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public record Tab<T extends AbstractFrame>(Component title, Function<Dim2i, T> frameFunction) {
 
-    public static Tab.Builder<?> createBuilder() {
+    public static Tab.Builder<?> builder() {
         return new Tab.Builder<>();
     }
 
@@ -28,12 +28,12 @@ public record Tab<T extends AbstractFrame>(Component title, Function<Dim2i, T> f
         private Component title;
         private Function<Dim2i, T> frameFunction;
 
-        public Builder<T> setTitle(Component title) {
+        public Builder<T> withTitle(Component title) {
             this.title = title;
             return this;
         }
 
-        public Builder<T> setFrameFunction(Function<Dim2i, T> frameFunction) {
+        public Builder<T> withFrameFunction(Function<Dim2i, T> frameFunction) {
             this.frameFunction = frameFunction;
             return this;
         }
@@ -44,14 +44,14 @@ public record Tab<T extends AbstractFrame>(Component title, Function<Dim2i, T> f
 
         public Tab<ScrollableFrame> from(OptionPage page, AtomicReference<Integer> verticalScrollBarOffset) {
             return new Tab<>(page.getName(), dim2i -> ScrollableFrame
-                    .createBuilder()
-                    .setDimension(dim2i)
-                    .setFrame(OptionPageFrame
-                            .createBuilder()
-                            .setDimension(new Dim2i(dim2i.x(), dim2i.y(), dim2i.width(), dim2i.height()))
-                            .setOptionPage(page)
+                    .builder()
+                    .withDimension(dim2i)
+                    .withFrame(OptionPageFrame
+                            .builder()
+                            .withDimension(new Dim2i(dim2i.x(), dim2i.y(), dim2i.width(), dim2i.height()))
+                            .withOptionPage(page)
                             .build())
-                    .setVerticalScrollBarOffset(verticalScrollBarOffset)
+                    .withVerticalScrollBarOffset(verticalScrollBarOffset)
                     .build());
         }
     }

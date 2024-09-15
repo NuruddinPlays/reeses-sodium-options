@@ -12,16 +12,15 @@ val FABRIC_API_VERSION by extra { "0.102.1+1.21.1" }
 val PARCHMENT_VERSION by extra { null }
 
 // https://semver.org/
-val MOD_VERSION by extra { "1.8.0-beta.2" }
-
-//
-val maven_group: String by project
-val archives_name: String by project
+val MAVEN_GROUP by extra { "me.flashyreese.mods" }
+val ARCHIVE_NAME by extra { "reeses-sodium-options" }
+val MOD_VERSION by extra { "1.8.0-beta.1" }
+val SODIUM_VERSION by extra { "mc1.21-0.6.0-beta.2" }
 
 allprojects {
     apply(plugin = "java")
     apply(plugin = "maven-publish")
-    group = maven_group
+    group = MAVEN_GROUP
     version = createVersionString()
 }
 
@@ -38,7 +37,7 @@ subprojects {
     }
 
     base {
-        archivesName = "$archives_name-${project.name}"
+        archivesName = "$ARCHIVE_NAME-${project.name}"
     }
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(21)

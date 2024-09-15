@@ -19,7 +19,7 @@ public class BasicFrame extends AbstractFrame {
         this.buildFrame();
     }
 
-    public static Builder createBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -44,12 +44,12 @@ public class BasicFrame extends AbstractFrame {
         private Dim2i dim;
         private boolean renderOutline;
 
-        public Builder setDimension(Dim2i dim) {
+        public Builder withDimension(Dim2i dim) {
             this.dim = dim;
             return this;
         }
 
-        public Builder shouldRenderOutline(boolean renderOutline) {
+        public Builder withRenderOutline(boolean renderOutline) {
             this.renderOutline = renderOutline;
             return this;
         }

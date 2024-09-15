@@ -75,58 +75,54 @@ public class SearchTextFieldComponent extends AbstractWidget {
         }
         if (!this.isFocused() && this.text.isBlank()) {
             String key = "rso.search_bar_empty";
-            Component text = Component.translatable(key);
-            if (text.getString().equals(key))
-                text = Component.literal("Search options...");
-            this.drawString(guiGraphics, text, this.dim.x() + 6, this.dim.y() + 6, 0xFFAAAAAA);
+            Component emptyText = Component.translatable(key);
+            if (emptyText.getString().equals(key))
+                emptyText = Component.literal("Search options...");
+            this.drawString(guiGraphics, emptyText, this.dim.x() + 6, this.dim.y() + 6, 0xFFAAAAAA);
         }
 
         this.drawRect(guiGraphics, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), this.isFocused() ? 0xE0000000 : 0x90000000);
-        int j = this.selectionStart - this.firstCharacterIndex;
-        int k = this.selectionEnd - this.firstCharacterIndex;
-        String string = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), this.getInnerWidth());
-        boolean bl = j >= 0 && j <= string.length();
-        int l = this.dim.x() + 6;
-        int m = this.dim.y() + 6;
-        int n = l;
-        if (k > string.length()) {
-            k = string.length();
+        int selectionStartOffset = this.selectionStart - this.firstCharacterIndex;
+        int selectionEndOffset = this.selectionEnd - this.firstCharacterIndex;
+        String displayedText = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), this.getInnerWidth());
+        boolean isCursorWithinDisplayedText = selectionStartOffset >= 0 && selectionStartOffset <= displayedText.length();
+        int textStartX = this.dim.x() + 6;
+        int textStartY = this.dim.y() + 6;
+        int textEndX = textStartX;
+        if (selectionEndOffset > displayedText.length()) {
+            selectionEndOffset = displayedText.length();
         }
-        if (!string.isEmpty()) {
-            String string2 = bl ? string.substring(0, j) : string;
-            n = guiGraphics.drawString(this.font, this.renderTextProvider.apply(string2, this.firstCharacterIndex), n, m, 0xFFFFFFFF);
+        if (!displayedText.isEmpty()) {
+            String preCursorText = isCursorWithinDisplayedText ? displayedText.substring(0, selectionStartOffset) : displayedText;
+            textEndX = guiGraphics.drawString(this.font, this.renderTextProvider.apply(preCursorText, this.firstCharacterIndex), textEndX, textStartY, 0xFFFFFFFF);
         }
-        boolean bl3 = this.selectionStart < this.text.length() || this.text.length() >= this.getMaxLength();
-        int o = n;
-        if (!bl) {
-            o = j > 0 ? l + this.dim.width() - 12 : l;
-        } else if (bl3) {
-            --o;
-            --n;
+        boolean isCursorAtEnd = this.selectionStart < this.text.length() || this.text.length() >= this.getMaxLength();
+        int cursorX = textEndX;
+        if (!isCursorWithinDisplayedText) {
+            cursorX = selectionStartOffset > 0 ? textStartX + this.dim.width() - 12 : textStartX;
+        } else if (isCursorAtEnd) {
+            --cursorX;
+            --textEndX;
         }
-        if (!string.isEmpty() && bl && j < string.length()) {
-            guiGraphics.drawString(this.font, this.renderTextProvider.apply(string.substring(j), this.selectionStart), n, m, 0xFFFFFFFF);
+        if (!displayedText.isEmpty() && isCursorWithinDisplayedText && selectionStartOffset < displayedText.length()) {
+            guiGraphics.drawString(this.font, this.renderTextProvider.apply(displayedText.substring(selectionStartOffset), this.selectionStart), textEndX, textStartY, 0xFFFFFFFF);
         }
         // Cursor
         if (this.isFocused()) {
-            guiGraphics.fill(RenderType.guiOverlay(), o, m - 1, o + 1, m + 1 + this.font.lineHeight, -3092272);
+            guiGraphics.fill(RenderType.guiOverlay(), cursorX, textStartY - 1, cursorX + 1, textStartY + 1 + this.font.lineHeight, -3092272);
         }
         // Highlighted text
-        if (k != j) {
-            int p = l + this.font.width(string.substring(0, k));
-            this.drawSelectionHighlight(guiGraphics, o, m - 1, p - 1, m + 1 + this.font.lineHeight);
+        if (selectionEndOffset != selectionStartOffset) {
+            int selectionEndX = textStartX + this.font.width(displayedText.substring(0, selectionEndOffset));
+            this.drawSelectionHighlight(guiGraphics, cursorX, textStartY - 1, selectionEndX - 1, textStartY + 1 + this.font.lineHeight);
         }
-
-        /*this.drawRect(context, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), 0x90000000);
-        //this.drawBorder(context, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), 0xffffffff);
-        this.drawString(context, this.text, this.dim.x() + 6, this.dim.y() + 6, 0xffffffff);*/
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int i = Mth.floor(mouseX) - this.dim.x() - 6;
-        String string = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), this.getInnerWidth());
-        this.setCursor(this.font.plainSubstrByWidth(string, i).length() + this.firstCharacterIndex);
+        int clickX = Mth.floor(mouseX) - this.dim.x() - 6;
+        String displayedText = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), this.getInnerWidth());
+        this.setCursor(this.font.plainSubstrByWidth(displayedText, clickX).length() + this.firstCharacterIndex);
 
         this.setFocused(this.dim.containsCursor(mouseX, mouseY));
         this.pages.forEach(page -> page
@@ -144,25 +140,25 @@ public class SearchTextFieldComponent extends AbstractWidget {
         this.focused = focused;
     }
 
-    private void drawSelectionHighlight(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2) {
-        int i;
-        if (x1 < x2) {
-            i = x1;
-            x1 = x2;
-            x2 = i;
+    private void drawSelectionHighlight(GuiGraphics guiGraphics, int startX, int startY, int endX, int endY) {
+        int temp;
+        if (startX < endX) {
+            temp = startX;
+            startX = endX;
+            endX = temp;
         }
-        if (y1 < y2) {
-            i = y1;
-            y1 = y2;
-            y2 = i;
+        if (startY < endY) {
+            temp = startY;
+            startY = endY;
+            endY = temp;
         }
-        if (x2 > this.dim.x() + this.dim.width()) {
-            x2 = this.dim.x() + this.dim.width();
+        if (endX > this.dim.x() + this.dim.width()) {
+            endX = this.dim.x() + this.dim.width();
         }
-        if (x1 > this.dim.x() + this.dim.width()) {
-            x1 = this.dim.x() + this.dim.width();
+        if (startX > this.dim.x() + this.dim.width()) {
+            startX = this.dim.x() + this.dim.width();
         }
-        guiGraphics.fill(RenderType.guiTextHighlight(), x1, y1, x2, y2, -16776961);
+        guiGraphics.fill(RenderType.guiTextHighlight(), startX, startY, endX, endY, -16776961);
     }
 
     private int getMaxLength() {
@@ -170,46 +166,48 @@ public class SearchTextFieldComponent extends AbstractWidget {
     }
 
     public String getSelectedText() {
-        int i = Math.min(this.selectionStart, this.selectionEnd);
-        int j = Math.max(this.selectionStart, this.selectionEnd);
-        return this.text.substring(i, j);
+        int selectionStartIndex = Math.min(this.selectionStart, this.selectionEnd);
+        int selectionEndIndex = Math.max(this.selectionStart, this.selectionEnd);
+        return this.text.substring(selectionStartIndex, selectionEndIndex);
     }
 
     public void write(String text) {
-
-
-        int i = Math.min(this.selectionStart, this.selectionEnd);
-        int j = Math.max(this.selectionStart, this.selectionEnd);
-        int k = this.maxLength - this.text.length() - (i - j);
-        String string = StringUtil.filterText(text);
-        int l = string.length();
-        if (k < l) {
-            string = string.substring(0, k);
-            l = k;
+        int selectionStartIndex = Math.min(this.selectionStart, this.selectionEnd);
+        int selectionEndIndex = Math.max(this.selectionStart, this.selectionEnd);
+        int availableSpace = this.maxLength - this.text.length() - (selectionStartIndex - selectionEndIndex);
+        String filteredText = StringUtil.filterText(text);
+        int filteredTextLength = filteredText.length();
+        if (availableSpace < filteredTextLength) {
+            filteredText = filteredText.substring(0, availableSpace);
+            filteredTextLength = availableSpace;
         }
 
-        String string2 = (new StringBuilder(this.text)).replace(i, j, string).toString();
-        if (this.textPredicate.test(string2)) {
-            this.text = string2;
-            this.setSelectionStart(i + l);
+        String beforeSelectionText = (new StringBuilder(this.text)).replace(selectionStartIndex, selectionEndIndex, filteredText).toString();
+        if (this.textPredicate.test(beforeSelectionText)) {
+            this.text = beforeSelectionText;
+            this.setSelectionStart(selectionStartIndex + filteredTextLength);
             this.setSelectionEnd(this.selectionStart);
             this.onChanged(this.text);
         }
     }
 
-    private void onChanged(String newText) {
-        this.pages.forEach(page -> page
-                .getOptions()
+    private void onChanged(String query) {
+        this.pages.forEach(page -> page.getOptions()
                 .stream()
                 .filter(OptionExtended.class::isInstance)
                 .map(OptionExtended.class::cast)
-                .forEach(optionExtended -> optionExtended.setHighlight(false)));
+                .forEach(optionExtended -> optionExtended.setHighlight(false))
+        );
 
-        this.lastSearch.set(newText.trim());
+        this.lastSearch.set(query.trim());
         if (this.editable) {
-            if (!newText.trim().isEmpty()) {
-                List<Option<?>> fuzzy = StringUtils.fuzzySearch(this.pages, newText, 2);
-                fuzzy.stream()
+            if (!query.trim().isEmpty()) {
+                List<Option<?>> searchResults = StringUtils.searchElements(
+                        () -> this.pages.stream().flatMap(p -> p.getOptions().stream()).iterator(),
+                        query,
+                        o -> String.format("%s %s", o.getName().getString(), o.getTooltip().getString())
+                );
+                searchResults.stream()
                         .filter(OptionExtended.class::isInstance)
                         .map(OptionExtended.class::cast)
                         .forEach(optionExtended -> optionExtended.setHighlight(true));
@@ -241,14 +239,14 @@ public class SearchTextFieldComponent extends AbstractWidget {
             if (this.selectionEnd != this.selectionStart) {
                 this.write("");
             } else {
-                int i = this.getCursorPosWithOffset(characterOffset);
-                int j = Math.min(i, this.selectionStart);
-                int k = Math.max(i, this.selectionStart);
-                if (j != k) {
-                    String string = (new StringBuilder(this.text)).delete(j, k).toString();
-                    if (this.textPredicate.test(string)) {
-                        this.text = string;
-                        this.setCursor(j);
+                int cursorPosWithOffset = this.getCursorPosWithOffset(characterOffset);
+                int startIndex = Math.min(cursorPosWithOffset, this.selectionStart);
+                int endIndex = Math.max(cursorPosWithOffset, this.selectionStart);
+                if (startIndex != endIndex) {
+                    String newText = new StringBuilder(this.text).delete(startIndex, endIndex).toString();
+                    if (this.textPredicate.test(newText)) {
+                        this.text = newText;
+                        this.setCursor(startIndex);
                         this.onChanged(this.text);
                     }
                 }
@@ -265,33 +263,32 @@ public class SearchTextFieldComponent extends AbstractWidget {
     }
 
     private int getWordSkipPosition(int wordOffset, int cursorPosition, boolean skipOverSpaces) {
-        int i = cursorPosition;
-        boolean bl = wordOffset < 0;
-        int j = Math.abs(wordOffset);
+        int newPosition = cursorPosition;
+        boolean isNegativeOffset = wordOffset < 0;
+        int absoluteOffset = Math.abs(wordOffset);
 
-        for (int k = 0; k < j; ++k) {
-            if (!bl) {
-                int l = this.text.length();
-                i = this.text.indexOf(32, i);
-                if (i == -1) {
-                    i = l;
+        for (int i = 0; i < absoluteOffset; ++i) {
+            if (!isNegativeOffset) {
+                int textLength = this.text.length();
+                newPosition = this.text.indexOf(' ', newPosition);
+                if (newPosition == -1) {
+                    newPosition = textLength;
                 } else {
-                    while (skipOverSpaces && i < l && this.text.charAt(i) == ' ') {
-                        ++i;
+                    while (skipOverSpaces && newPosition < textLength && this.text.charAt(newPosition) == ' ') {
+                        ++newPosition;
                     }
                 }
             } else {
-                while (skipOverSpaces && i > 0 && this.text.charAt(i - 1) == ' ') {
-                    --i;
+                while (skipOverSpaces && newPosition > 0 && this.text.charAt(newPosition - 1) == ' ') {
+                    --newPosition;
                 }
-
-                while (i > 0 && this.text.charAt(i - 1) != ' ') {
-                    --i;
+                while (newPosition > 0 && this.text.charAt(newPosition - 1) != ' ') {
+                    --newPosition;
                 }
             }
         }
 
-        return i;
+        return newPosition;
     }
 
     public int getCursor() {
@@ -328,27 +325,27 @@ public class SearchTextFieldComponent extends AbstractWidget {
     }
 
     public void setSelectionEnd(int index) {
-        int i = this.text.length();
-        this.selectionEnd = Mth.clamp(index, 0, i);
+        int textLength = this.text.length();
+        this.selectionEnd = Mth.clamp(index, 0, textLength);
         if (this.font != null) {
-            if (this.firstCharacterIndex > i) {
-                this.firstCharacterIndex = i;
+            if (this.firstCharacterIndex > textLength) {
+                this.firstCharacterIndex = textLength;
             }
 
-            int j = this.getInnerWidth();
-            String string = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), j);
-            int k = string.length() + this.firstCharacterIndex;
+            int innerWidth = this.getInnerWidth();
+            String displayText = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), innerWidth);
+            int endIndex = displayText.length() + this.firstCharacterIndex;
             if (this.selectionEnd == this.firstCharacterIndex) {
-                this.firstCharacterIndex -= this.font.plainSubstrByWidth(this.text, j, true).length();
+                this.firstCharacterIndex -= this.font.plainSubstrByWidth(this.text, innerWidth, true).length();
             }
 
-            if (this.selectionEnd > k) {
-                this.firstCharacterIndex += this.selectionEnd - k;
+            if (this.selectionEnd > endIndex) {
+                this.firstCharacterIndex += this.selectionEnd - endIndex;
             } else if (this.selectionEnd <= this.firstCharacterIndex) {
                 this.firstCharacterIndex -= this.firstCharacterIndex - this.selectionEnd;
             }
 
-            this.firstCharacterIndex = Mth.clamp(this.firstCharacterIndex, 0, i);
+            this.firstCharacterIndex = Mth.clamp(this.firstCharacterIndex, 0, textLength);
         }
     }
 
@@ -374,12 +371,12 @@ public class SearchTextFieldComponent extends AbstractWidget {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        this.pages.forEach(page2 -> page2
-                .getOptions()
+        this.pages.forEach(page -> page.getOptions()
                 .stream()
                 .filter(OptionExtended.class::isInstance)
                 .map(OptionExtended.class::cast)
-                .forEach(optionExtended2 -> optionExtended2.setSelected(false)));
+                .forEach(optionExtended -> optionExtended.setSelected(false))
+        );
         if (!this.isActive()) {
             return false;
         } else {
@@ -420,7 +417,6 @@ public class SearchTextFieldComponent extends AbstractWidget {
                                             int inputOffset = input + optionDim.height() == parentDim.height() ? parentDim.height() : input;
                                             int offset = inputOffset * maxOffset / parentDim.height();
 
-
                                             int total = this.pages.stream().mapToInt(page2 -> Math.toIntExact(page2.getOptions().stream().filter(OptionExtended.class::isInstance).map(OptionExtended.class::cast).filter(OptionExtended::isHighlight).count())).sum();
 
                                             int value = total == this.lastSearchIndex.get() + 1 ? 0 : this.lastSearchIndex.get() + 1;
@@ -429,7 +425,6 @@ public class SearchTextFieldComponent extends AbstractWidget {
                                             this.tabFrameSelectedTab.set(page.getName());
                                             // todo: calculate tab frame scroll bar offset
                                             this.tabFrameScrollBarOffset.set(0);
-
 
                                             this.optionPageScrollBarOffset.set(offset);
                                             this.setFocused(false);

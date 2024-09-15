@@ -9,8 +9,10 @@ val PARCHMENT_VERSION: String? by rootProject.extra
 val NEOFORGE_VERSION: String by rootProject.extra
 val MOD_VERSION: String by rootProject.extra
 
+val SODIUM_VERSION: String by rootProject.extra
+
 base {
-    archivesName = "reeses-sodium-options-neoforge"
+    archivesName = "${rootProject.name}-neoforge"
 }
 
 repositories {
@@ -83,7 +85,7 @@ tasks.named("compileTestJava").configure {
 
 dependencies {
     compileOnly(project(":common"))
-    implementation("maven.modrinth:sodium:mc1.21-0.6.0-beta.1-neoforge")
+    implementation("maven.modrinth:sodium:$SODIUM_VERSION-neoforge")
 }
 
 // NeoGradle compiles the game, but we don't want to add our common code to the game's code
