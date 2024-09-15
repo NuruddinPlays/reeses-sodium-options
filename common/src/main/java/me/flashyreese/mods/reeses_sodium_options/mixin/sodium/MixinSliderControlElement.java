@@ -10,6 +10,7 @@ import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.*;
@@ -66,10 +67,10 @@ public abstract class MixinSliderControlElement extends ControlElement<Integer> 
         this.sliderBounds = new Rect2i(this.dim.getLimitX() - 96, this.dim.getCenterY() - 5, 90, 10);
     }
 
-    @Inject(method = "renderSlider", at = @At(value = "TAIL"))
-    public void rso$renderSlider(GuiGraphics guiGraphics, CallbackInfo ci, @Local(ordinal = 1) int sliderY, @Local(ordinal = 3) int sliderHeight, @Local(ordinal = 4) int thumbX) {
-        if (this.isFocused() && this.isEditMode()) {
-            this.drawRect(guiGraphics, thumbX - 1, sliderY - 1, thumbX + 5, sliderY + sliderHeight + 1, 0xFFFFFFFF);
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/gui/options/control/SliderControl$Button;drawString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/network/chat/Component;III)V", ordinal = 0), locals = LocalCapture.CAPTURE_FAILSOFT)
+    public void rso$renderSlider(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci, int sliderX, int sliderY, int sliderWidth, int sliderHeight, MutableComponent label, int labelWidth, boolean drawSlider, double thumbOffset, int thumbX, int trackY) {
+        if (drawSlider && this.isFocused() && this.isEditMode()) {
+            this.drawRect(graphics, thumbX - 1, sliderY - 1, thumbX + 5, sliderY + sliderHeight + 1, 0xFFFFFFFF);
         }
     }
 
