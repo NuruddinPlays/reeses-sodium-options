@@ -26,7 +26,6 @@ public class BasicFrame extends AbstractFrame {
     @Override
     public void buildFrame() {
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         this.functions.forEach(function -> this.children.add(function.apply(dim)));
