@@ -44,7 +44,6 @@ public class OptionPageFrame extends AbstractFrame {
 
     public void setupFrame() {
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         int y = 0;
@@ -72,7 +71,6 @@ public class OptionPageFrame extends AbstractFrame {
         if (this.page == null) return;
 
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         int y = 0;

@@ -1,6 +1,5 @@
 package me.flashyreese.mods.reeses_sodium_options.mixin.sodium;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import me.flashyreese.mods.reeses_sodium_options.client.gui.SliderControlElementExtended;
 import net.caffeinemc.mods.sodium.client.gui.options.Option;
 import net.caffeinemc.mods.sodium.client.gui.options.control.ControlElement;
@@ -9,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;

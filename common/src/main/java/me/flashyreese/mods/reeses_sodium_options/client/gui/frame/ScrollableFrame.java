@@ -90,7 +90,6 @@ public class ScrollableFrame extends AbstractFrame {
     @Override
     public void buildFrame() {
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         if (this.canScrollHorizontal) {
@@ -138,7 +137,7 @@ public class ScrollableFrame extends AbstractFrame {
             if (this.renderOutline) {
                 this.drawBorder(guiGraphics, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), 0xFFAAAAAA);
             }
-            this.applyScissor(this.viewPortDimension.x(), this.viewPortDimension.y(), this.viewPortDimension.width(), this.viewPortDimension.height(), () -> super.render(guiGraphics, mouseX, mouseY, delta));
+            this.applyScissor(guiGraphics, this.viewPortDimension.x(), this.viewPortDimension.y(), this.viewPortDimension.width(), this.viewPortDimension.height(), () -> super.render(guiGraphics, mouseX, mouseY, delta));
         } else {
             super.render(guiGraphics, mouseX, mouseY, delta);
         }

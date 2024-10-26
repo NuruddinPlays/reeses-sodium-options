@@ -78,10 +78,9 @@ public class TabFrame extends AbstractFrame {
     @Override
     public void buildFrame() {
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
-        if (this.selectedTab.isEmpty() || this.selectedTab.isEmpty()) {
+        if (this.selectedTab.isEmpty()) {
             if (!this.tabs.isEmpty()) {
                 // Just use the first tab for now
                 this.selectedTab = Optional.ofNullable(this.tabs.getFirst());
@@ -143,7 +142,7 @@ public class TabFrame extends AbstractFrame {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.applyScissor(this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height(), () -> {
+        this.applyScissor(guiGraphics, this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height(), () -> {
             for (AbstractWidget widget : this.children) {
                 if (widget != this.selectedFrame) {
                     widget.render(guiGraphics, mouseX, mouseY, delta);
