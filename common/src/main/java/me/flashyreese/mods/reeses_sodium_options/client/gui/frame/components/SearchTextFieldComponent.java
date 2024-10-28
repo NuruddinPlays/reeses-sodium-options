@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -75,7 +76,7 @@ public class SearchTextFieldComponent extends AbstractWidget {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         if (!this.isVisible()) {
             return;
         }
@@ -338,26 +339,24 @@ public class SearchTextFieldComponent extends AbstractWidget {
     public void setSelectionEnd(int index) {
         int textLength = this.text.length();
         this.selectionEnd = Mth.clamp(index, 0, textLength);
-        if (this.font != null) {
-            if (this.firstCharacterIndex > textLength) {
-                this.firstCharacterIndex = textLength;
-            }
-
-            int innerWidth = this.getInnerWidth();
-            String displayText = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), innerWidth);
-            int endIndex = displayText.length() + this.firstCharacterIndex;
-            if (this.selectionEnd == this.firstCharacterIndex) {
-                this.firstCharacterIndex -= this.font.plainSubstrByWidth(this.text, innerWidth, true).length();
-            }
-
-            if (this.selectionEnd > endIndex) {
-                this.firstCharacterIndex += this.selectionEnd - endIndex;
-            } else if (this.selectionEnd <= this.firstCharacterIndex) {
-                this.firstCharacterIndex -= this.firstCharacterIndex - this.selectionEnd;
-            }
-
-            this.firstCharacterIndex = Mth.clamp(this.firstCharacterIndex, 0, textLength);
+        if (this.firstCharacterIndex > textLength) {
+            this.firstCharacterIndex = textLength;
         }
+
+        int innerWidth = this.getInnerWidth();
+        String displayText = this.font.plainSubstrByWidth(this.text.substring(this.firstCharacterIndex), innerWidth);
+        int endIndex = displayText.length() + this.firstCharacterIndex;
+        if (this.selectionEnd == this.firstCharacterIndex) {
+            this.firstCharacterIndex -= this.font.plainSubstrByWidth(this.text, innerWidth, true).length();
+        }
+
+        if (this.selectionEnd > endIndex) {
+            this.firstCharacterIndex += this.selectionEnd - endIndex;
+        } else if (this.selectionEnd <= this.firstCharacterIndex) {
+            this.firstCharacterIndex -= this.firstCharacterIndex - this.selectionEnd;
+        }
+
+        this.firstCharacterIndex = Mth.clamp(this.firstCharacterIndex, 0, textLength);
     }
 
     public boolean isActive() {
@@ -543,7 +542,7 @@ public class SearchTextFieldComponent extends AbstractWidget {
     }
 
     @Override
-    public ScreenRectangle getRectangle() {
+    public @NotNull ScreenRectangle getRectangle() {
         return new ScreenRectangle(this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height());
     }
 }

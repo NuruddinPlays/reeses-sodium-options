@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public abstract class AbstractFrame extends AbstractWidget implements ContainerE
     }
 
     @Override
-    public void render(GuiGraphics drawContext, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics drawContext, int mouseX, int mouseY, float delta) {
         if (this.renderOutline) {
             this.drawBorder(drawContext, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), 0xFFAAAAAA);
         }
@@ -85,7 +86,7 @@ public abstract class AbstractFrame extends AbstractWidget implements ContainerE
     }
 
     @Override
-    public List<? extends GuiEventListener> children() {
+    public @NotNull List<? extends GuiEventListener> children() {
         return this.children;
     }
 
@@ -95,12 +96,12 @@ public abstract class AbstractFrame extends AbstractWidget implements ContainerE
     }
 
     @Override
-    public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigation) {
+    public @Nullable ComponentPath nextFocusPath(@NotNull FocusNavigationEvent navigation) {
         return ContainerEventHandler.super.nextFocusPath(navigation);
     }
 
     @Override
-    public ScreenRectangle getRectangle() {
+    public @NotNull ScreenRectangle getRectangle() {
         return new ScreenRectangle(this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height());
     }
 

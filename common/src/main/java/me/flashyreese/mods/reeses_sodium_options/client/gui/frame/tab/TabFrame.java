@@ -11,6 +11,7 @@ import net.caffeinemc.mods.sodium.client.util.Dim2i;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class TabFrame extends AbstractFrame {
 
         this.onSetTab = onSetTab;
         if (this.tabSectionCanScroll) {
-            this.tabSectionScrollBar = new ScrollBarComponent(new Dim2i(this.tabSection.getLimitX() - 11, this.tabSection.y(), 10, this.tabSection.height()), ScrollBarComponent.Mode.VERTICAL, tabSectionY, this.dim.height(), offset -> {
+            this.tabSectionScrollBar = new ScrollBarComponent(new Dim2i(this.tabSection.getLimitX() - 11, this.tabSection.y(), 10, this.tabSection.height()), ScrollBarComponent.ScrollDirection.VERTICAL, tabSectionY, this.dim.height(), offset -> {
                 //this.buildFrame();
                 tabSectionScrollBarOffset.set(offset);
                 ((Dim2iExtended) ((Object) this.tabSection)).setY(this.dim.y() - this.tabSectionScrollBar.getOffset());
@@ -91,7 +92,7 @@ public class TabFrame extends AbstractFrame {
         this.rebuildTabFrame();
 
         if (this.tabSectionCanScroll) {
-            this.tabSectionScrollBar.updateThumbPosition();
+            this.tabSectionScrollBar.updateThumbLocation();
             this.children.add(this.tabSectionScrollBar);
         }
 
@@ -113,9 +114,6 @@ public class TabFrame extends AbstractFrame {
     private void rebuildTabs() {
         int offsetY = 0;
         for (Tab<?> tab : this.tabs) {
-            int x = this.tabSection.x();
-            int y = this.tabSection.y();
-            //int yOffset = offsetY - (this.tabSectionCanScroll ? this.tabSectionScrollBar.getOffset() : 0);
             int width = this.tabSection.width() - (this.tabSectionCanScroll ? 12 : 4);
             int height = 18;
             Dim2i tabDim = new Dim2i(0, offsetY, width, height);
@@ -141,7 +139,7 @@ public class TabFrame extends AbstractFrame {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         this.applyScissor(guiGraphics, this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height(), () -> {
             for (AbstractWidget widget : this.children) {
                 if (widget != this.selectedFrame) {
