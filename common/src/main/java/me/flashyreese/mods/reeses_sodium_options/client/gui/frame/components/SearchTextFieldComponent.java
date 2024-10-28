@@ -53,6 +53,12 @@ public class SearchTextFieldComponent extends AbstractWidget {
     private int selectionEnd;
     private int lastCursorPosition = this.getCursor();
 
+    // Cursor properties
+    private static final long CURSOR_ANIMATION_DURATION = 750;
+    private long nextCursorUpdate;
+    private boolean currentCursorState;
+    private float currentCursorAlpha;
+
     public SearchTextFieldComponent(Dim2i dim, List<OptionPage> pages, AtomicReference<Component> tabFrameSelectedTab, AtomicReference<Integer> tabFrameScrollBarOffset, AtomicReference<Integer> optionPageScrollBarOffset, int tabDimHeight, SodiumVideoOptionsScreen sodiumVideoOptionsScreen, AtomicReference<String> lastSearch, AtomicReference<Integer> lastSearchIndex) {
         this.dim = dim;
         this.pages = pages;
@@ -73,6 +79,7 @@ public class SearchTextFieldComponent extends AbstractWidget {
         if (!this.isVisible()) {
             return;
         }
+        updateCursorAlpha();
         if (!this.isFocused() && this.text.isBlank()) {
             String key = "rso.search_bar_empty";
             Component emptyText = Component.translatable(key);
@@ -109,7 +116,8 @@ public class SearchTextFieldComponent extends AbstractWidget {
         }
         // Cursor
         if (this.isFocused()) {
-            guiGraphics.fill(RenderType.guiOverlay(), cursorX, textStartY - 1, cursorX + 1, textStartY + 1 + this.font.lineHeight, -3092272);
+            int color = ((int) (this.currentCursorAlpha * 255) << 24) | 0x00D0D0D0;
+            guiGraphics.fill(RenderType.guiOverlay(), cursorX, textStartY - 1, cursorX + 1, textStartY + 1 + this.font.lineHeight, color);
         }
         // Highlighted text
         if (selectionEndOffset != selectionStartOffset) {
@@ -184,6 +192,9 @@ public class SearchTextFieldComponent extends AbstractWidget {
 
         String beforeSelectionText = (new StringBuilder(this.text)).replace(selectionStartIndex, selectionEndIndex, filteredText).toString();
         if (this.textPredicate.test(beforeSelectionText)) {
+            this.currentCursorState = true;
+            this.nextCursorUpdate = System.currentTimeMillis() + CURSOR_ANIMATION_DURATION;
+
             this.text = beforeSelectionText;
             this.setSelectionStart(selectionStartIndex + filteredTextLength);
             this.setSelectionEnd(this.selectionStart);
@@ -488,6 +499,28 @@ public class SearchTextFieldComponent extends AbstractWidget {
                 }
             }
         }
+    }
+
+    private void updateCursorAlpha() {
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis >= this.nextCursorUpdate) {
+            this.currentCursorState = !this.currentCursorState;
+            this.nextCursorUpdate = currentTimeMillis + CURSOR_ANIMATION_DURATION;
+        }
+
+        float cursorAlpha = (float) (this.nextCursorUpdate - currentTimeMillis) / CURSOR_ANIMATION_DURATION;
+
+        if (cursorAlpha <= 0.25f) {
+            cursorAlpha *= 4f;
+        } else if (cursorAlpha >= 0.75f) {
+            cursorAlpha = (1 - cursorAlpha) * 4f;
+        } else {
+            cursorAlpha = 1f;
+        }
+
+        cursorAlpha = Math.clamp(cursorAlpha, 0f, 1f);
+
+        this.currentCursorAlpha = this.currentCursorState ? 1 : 1 - cursorAlpha;
     }
 
     public boolean isVisible() {
