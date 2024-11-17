@@ -7,6 +7,7 @@ import net.caffeinemc.mods.sodium.client.util.Dim2i;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -70,7 +71,7 @@ public class ScrollableFrame extends AbstractFrame {
         }
 
         if (this.canScrollHorizontal) {
-            this.horizontalScrollBar = new ScrollBarComponent(new Dim2i(this.viewPortDimension.x(), this.viewPortDimension.getLimitY() + 1, this.viewPortDimension.width(), 10), ScrollBarComponent.Mode.HORIZONTAL, this.frame.dim.width(), this.viewPortDimension.width(), offset -> {
+            this.horizontalScrollBar = new ScrollBarComponent(new Dim2i(this.viewPortDimension.x(), this.viewPortDimension.getLimitY() + 1, this.viewPortDimension.width(), 10), ScrollBarComponent.ScrollDirection.HORIZONTAL, this.frame.dim.width(), this.viewPortDimension.width(), offset -> {
                 //this.buildFrame();
                 ((Dim2iExtended) ((Object) this.frame.dim)).setX(this.frameOrigin.x() - this.horizontalScrollBar.getOffset());
                 horizontalScrollBarOffset.set(offset);
@@ -78,7 +79,7 @@ public class ScrollableFrame extends AbstractFrame {
             this.horizontalScrollBar.setOffset(horizontalScrollBarOffset.get());
         }
         if (this.canScrollVertical) {
-            this.verticalScrollBar = new ScrollBarComponent(new Dim2i(this.viewPortDimension.getLimitX() + 1, this.viewPortDimension.y(), 10, this.viewPortDimension.height()), ScrollBarComponent.Mode.VERTICAL, this.frame.dim.height(), this.viewPortDimension.height(), offset -> {
+            this.verticalScrollBar = new ScrollBarComponent(new Dim2i(this.viewPortDimension.getLimitX() + 1, this.viewPortDimension.y(), 10, this.viewPortDimension.height()), ScrollBarComponent.ScrollDirection.VERTICAL, this.frame.dim.height(), this.viewPortDimension.height(), offset -> {
                 //this.buildFrame();
                 ((Dim2iExtended) ((Object) this.frame.dim)).setY(this.frameOrigin.y() - this.verticalScrollBar.getOffset());
                 verticalScrollBarOffset.set(offset);
@@ -93,11 +94,11 @@ public class ScrollableFrame extends AbstractFrame {
         this.controlElements.clear();
 
         if (this.canScrollHorizontal) {
-            this.horizontalScrollBar.updateThumbPosition();
+            this.horizontalScrollBar.updateThumbLocation();
         }
 
         if (this.canScrollVertical) {
-            this.verticalScrollBar.updateThumbPosition();
+            this.verticalScrollBar.updateThumbLocation();
         }
 
         if (this.canScrollHorizontal) {
@@ -132,7 +133,7 @@ public class ScrollableFrame extends AbstractFrame {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         if (this.canScrollHorizontal || this.canScrollVertical) {
             if (this.renderOutline) {
                 this.drawBorder(guiGraphics, this.dim.x(), this.dim.y(), this.dim.getLimitX(), this.dim.getLimitY(), 0xFFAAAAAA);
@@ -152,7 +153,7 @@ public class ScrollableFrame extends AbstractFrame {
     }
 
     @Override
-    public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigation) {
+    public @Nullable ComponentPath nextFocusPath(@NotNull FocusNavigationEvent navigation) {
         //this.snapFocusedInViewport();
         return super.nextFocusPath(navigation);
     }

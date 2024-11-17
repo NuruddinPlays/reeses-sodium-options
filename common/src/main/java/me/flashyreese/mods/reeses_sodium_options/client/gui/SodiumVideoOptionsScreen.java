@@ -25,16 +25,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.VideoSettingsScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -49,7 +47,6 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
 
     private final Screen prevScreen;
     private final List<OptionPage> pages = new ArrayList<>();
-    private AbstractFrame frame;
     private FlatButtonWidget applyButton, closeButton, undoButton;
     private FlatButtonWidget donateButton, hideDonateButton;
     private boolean hasPendingChanges;
@@ -128,14 +125,14 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
     protected void init() {
         super.init();
 
-        this.frame = this.parentFrameBuilder().build();
-        this.addRenderableWidget(this.frame);
+        AbstractFrame frame = this.parentFrameBuilder().build();
+        this.addRenderableWidget(frame);
 
         this.searchTextField.setFocused(!lastSearch.get().trim().isEmpty());
         if (this.searchTextField.isFocused()) {
             this.setFocused(this.searchTextField);
         } else {
-            this.setFocused(this.frame);
+            this.setFocused(frame);
         }
 
         if (this.prompt != null) {
@@ -189,7 +186,7 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
 
         if (IrisCompat.isIrisPresent()) { // FabricLoader.getInstance().isModLoaded("iris")) {
             //int size = this.client.textRenderer.getWidth(Text.translatable(IrisApi.getInstance().getMainScreenLanguageKey()));
-            int size = this.minecraft.font.width(Component.translatable(IrisCompat.getIrisShaderPacksScreenLanguageKey()));
+            int size = this.minecraft.font.width(Component.translatable(Objects.requireNonNull(IrisCompat.getIrisShaderPacksScreenLanguageKey())));
             Dim2i shaderPackButtonDim;
             if (!(SodiumClientMod.options().notifications.hasClearedDonationButton)) {
                 shaderPackButtonDim = new Dim2i(donateButtonDim.x() - 12 - size, tabFrameDim.y() - 26, 10 + size, 20);
@@ -238,10 +235,9 @@ public class SodiumVideoOptionsScreen extends Screen implements ScreenPromptable
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         this.updateControls();
         super.render(guiGraphics, this.prompt != null ? -1 : mouseX, this.prompt != null ? -1 : mouseY, delta);
-        this.frame.render(guiGraphics, this.prompt != null ? -1 : mouseX, this.prompt != null ? -1 : mouseY, delta);
         if (this.prompt != null) {
             this.prompt.render(guiGraphics, mouseX, mouseY, delta);
         }

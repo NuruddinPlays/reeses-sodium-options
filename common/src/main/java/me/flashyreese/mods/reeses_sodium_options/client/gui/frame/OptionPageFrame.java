@@ -19,6 +19,7 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class OptionPageFrame extends AbstractFrame {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         ControlElement<?> hoveredElement = this.controlElements.stream()
                 .filter(controlElement -> ((Dim2iExtended) (Object) controlElement.getDimensions()).overlapWith(this.originalDim))
                 .filter(ControlElement::isHovered)
@@ -167,7 +168,7 @@ public class OptionPageFrame extends AbstractFrame {
     }
 
     @Override
-    public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigation) {
+    public @Nullable ComponentPath nextFocusPath(@NotNull FocusNavigationEvent navigation) {
         return super.nextFocusPath(navigation);
     }
 
