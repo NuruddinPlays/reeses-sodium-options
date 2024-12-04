@@ -149,6 +149,11 @@ public class SearchTextFieldComponent extends AbstractWidget {
         this.focused = focused;
     }
 
+    @Override
+    public boolean isMouseOver(double x, double y) {
+        return this.dim.containsCursor(x, y);
+    }
+
     private void drawSelectionHighlight(GuiGraphics guiGraphics, int startX, int startY, int endX, int endY) {
         int temp;
         if (startX < endX) {

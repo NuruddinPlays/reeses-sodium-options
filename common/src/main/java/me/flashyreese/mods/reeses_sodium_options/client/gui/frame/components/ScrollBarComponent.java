@@ -150,6 +150,11 @@ public class ScrollBarComponent extends AbstractWidget {
         return false;
     }
 
+    @Override
+    public boolean isMouseOver(double x, double y) {
+        return this.scrollBarArea.containsCursor(x, y);
+    }
+
     public enum ScrollDirection {
         HORIZONTAL,
         VERTICAL
